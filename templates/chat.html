@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+  <h2>Talk Smack</h2>
+  <h4>You can do your thing 😁</h4>
+  <div id="chat-box" style="border:1px solid black; height:200px; overflow-y:scroll;">
+    {% for msg in messages %}
+      <p>{{ msg.sender }}: {{ msg.content }}</p>
+    {% endfor %}
+  </div>
+  <input id="msg" placeholder="Type message...">
+  <button onclick="sendMsg()">Send</button>
+  <br><a href="/logout">Logout</a>
+
+  <script>
+    var socket = io();
+    socket.on('message', function(msg) {
+      var box = document.getElementById("chat-box");
+      box.innerHTML += "<p>" + msg + "</p>";
+      box.scrollTop = box.scrollHeight;  // auto-scroll
+    });
+    function sendMsg() {
+      var msg = document.getElementById("msg").value;
+      socket.send(msg);
+      document.getElementById("msg").value = "";
+    }
+  </script>
+</body>
+</html>
