@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head><title>Register</title></head>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
 <body>
-  <h2>Register</h2>
-  <form method="POST">
-    <input name="username" placeholder="Username"><br>
-    <input type="password" name="password" placeholder="Password"><br>
-    <button type="submit">Register</button>
-  </form>
-  <a href="/login">Already have an account? Login</a>
+  <div class="user-space">
+    <h2 id="task">Register</h2><hr>
+    <form method="POST" enctype="multipart/form-data">
+      <input name="username" placeholder="Username">
+
+      <input type="password" name="password" placeholder="Password">
+
+      <input type="password" name="confirm_password" placeholder="Confirm Password">
+
+      <input type="email" name="email" placeholder="Email Address">
+
+      <input type="date" name="dob" placeholder="Date of Birth">
+
+      <input type="file" name="profile_pic">
+
+      <button type="submit">Register</button>
+    </form>
+    <h3>Have an account? <a href="/login"> Login</a></h3>
+  </div>
 </body>
 </html>

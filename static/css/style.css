@@ -1,0 +1,156 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #f9f9f9, #ececec); /* soft whitish background */
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.user-space {
+    width: 300px;
+    padding: 40px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0px 12px 25px rgba(0,0,0,0.25);
+    text-align: center;
+    animation: popIn 0.5s ease-out; /* entry animation */
+}
+
+/* Form layout */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Labels */
+label {
+    text-align: left;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #444;
+}
+
+#task{
+    margin-top: -10px;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size:large;
+    transition: all 0.3s ease;
+    width: 93%;
+}
+
+
+input:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 8px rgba(0,123,255,0.5);
+    outline: none;
+}
+
+button {
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #0056b3, #0099cc);
+    transform: translateY(-2px);
+    box-shadow: 0px 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0px 3px 8px rgba(0, 123, 255, 0.5);
+}
+
+a {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: #007bff;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+#chat-box {
+    width: 400px;
+    padding: 30px;
+    border-radius: 12px;
+    background: #adacac;
+    box-shadow: 0px 12px 25px rgba(0,0,0,0.25);
+    margin-top: 20px;
+    animation: popIn 0.5s ease-out; 
+}
+
+.chat-messages{
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+
+.chat-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.profile-space {
+    background: #313030;
+    color: white;
+    padding: 10px 10px;
+    border-radius: 12px;
+    max-width: 300px;
+    box-shadow: 0px 4px 8px rgba(169, 5, 5, 0.1);
+    margin-top: 10px;
+}
+
+.time {
+    font-size: 0.9em;
+    color: #101010;
+    margin-left: 10px;
+}
+
+#msg{
+    margin-top: 30px;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

@@ -3,13 +3,18 @@
 <head>
   <title>Chat</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+  
   <h2>Talk Smack</h2>
-  <h4>You can do your thing 😁</h4>
   <div id="chat-box" style="border:1px solid black; height:200px; overflow-y:scroll;">
     {% for msg in messages %}
-      <p>{{ msg.sender }}: {{ msg.content }}</p>
+      <div class="chat-messages">
+        <img src="{{ url_for('static', filename='profile_pics/' ~ msg.profile_pic) }}" class="chat-pic">
+        <div class="profile-space">{{ msg.content}} </div>
+        <span class="time">{{ msg.timestamp }}</span>
+      </div>
     {% endfor %}
   </div>
   <input id="msg" placeholder="Type message...">
@@ -18,11 +23,21 @@
 
   <script>
     var socket = io();
-    socket.on('message', function(msg) {
-      var box = document.getElementById("chat-box");
-      box.innerHTML += "<p>" + msg + "</p>";
-      box.scrollTop = box.scrollHeight;  // auto-scroll
+    socket.on('message', function(data) {
+    let chatBox = document.getElementById('chat-box');
+
+    let div = document.createElement('div');
+    div.classList.add('chat-message');
+    div.innerHTML = `
+        <img src="/static/profile_pics/${data.profile_pic}" class="chat-pic">
+        <b>${data.username}</b>: ${data.content}
+        <span class="time">${data.timestamp}</span>
+    `;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;  // auto-scroll
     });
+
     function sendMsg() {
       var msg = document.getElementById("msg").value;
       socket.send(msg);

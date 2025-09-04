@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head><title>Login</title></head>
+<head><title>Login</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
 <body>
-  <h2>Login</h2>
-  <form method="POST">
-    <input name="username" placeholder="Username"><br>
-    <input type="password" name="password" placeholder="Password"><br>
-    <button type="submit">Login</button>
-  </form>
-  <a href="/register">Create new account</a>
+  <div class="user-space">
+    <h2 id="task">Login</h2>
+    <hr style="width: 100%;">
+    <form method="POST">
+      <input name="username" placeholder="Username">
+      <input type="password" name="password" placeholder="Password">
+      <button type="submit">Login</button>
+    </form>
+    <h3>Don't have an account? <a href="/register"> Register</a> it's free</h3>
+  </div>
 </body>
 </html>
