@@ -2,47 +2,62 @@
 <html>
 <head>
   <title>Chat</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
-<body>
-  
-  <h2>Talk Smack</h2>
-  <div id="chat-box" style="border:1px solid black; height:200px; overflow-y:scroll;">
-    {% for msg in messages %}
-      <div class="chat-messages">
-        <img src="{{ url_for('static', filename='profile_pics/' ~ msg.profile_pic) }}" class="chat-pic">
-        <div class="profile-space">{{ msg.content}} </div>
-        <span class="time">{{ msg.timestamp }}</span>
-      </div>
-    {% endfor %}
-  </div>
-  <input id="msg" placeholder="Type message...">
-  <button onclick="sendMsg()">Send</button>
-  <br><a href="/logout">Logout</a>
 
-  <script>
-    var socket = io();
-    socket.on('message', function(data) {
-    let chatBox = document.getElementById('chat-box');
+<body class="messages-page">
+  <div class="main-container">
+        <div class="side-bar">
+            <!-- Profile header section -->
+            <div class="profile-header">
+                <div class="user-profile">
+                    <div class="user-profile-info">
+                        <div id="imge">{{ current_user.username[:2].upper() }}</div>
+                        <div class="same" id="name">{{ current_user.username }}</div>
+                        <div class="logout-button"><a href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a></div>
+                    </div>
+                </div>
 
-    let div = document.createElement('div');
-    div.classList.add('chat-message');
-    div.innerHTML = `
-        <img src="/static/profile_pics/${data.profile_pic}" class="chat-pic">
-        <b>${data.username}</b>: ${data.content}
-        <span class="time">${data.timestamp}</span>
-    `;
+                <div class="csb-options">
+                    <a href="/chat"><i class="fa-regular fa-comments"></i></a>
+                    <a href="/friend_requests"><i class="fa-regular fa-bell"></i></a>
+                    <a href="/add_friend"><i class="fa-regular fa-user"></i></a>
+                </div>
+            </div>
 
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;  // auto-scroll
-    });
+            <!-- Sidebar body -->
+            <div class="profile-body">
+              <h3>Friends</h3>
+              <div id="friends-list">
+                    {% if friends %}
+                        {% for friend in friends %}
+                        <div class="other-users" onclick="window.location.href='/chat/{{ friend.id }}'">
+                            <div style="display: flex; align-items: center;">
+                                <div class="user-avatar" style="width: 20%;">{{ friend.username[:2].upper() }}</div>
+                                <div style="margin-left: 5px;">
+                                    <div style="font-weight: bold;">{{ friend.username }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="profile-body-msg" style="justify-content: center; text-align:center; margin-top: 50%; font-weight:100">No friends yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-    function sendMsg() {
-      var msg = document.getElementById("msg").value;
-      socket.send(msg);
-      document.getElementById("msg").value = "";
-    }
-  </script>
+        <!-- Main chat body -->
+        <div class="main-body">
+          <!-- <div class="main-body-header"></div> -->
+            <div class="chat-area">
+                <div class="chat-area-header">Select a conversation to start chatting</div>
+                <div class="message-area">Or add a new friend to begin a conversation</div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

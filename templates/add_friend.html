@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body class="friend-requests-page"> 
+  <div class="main-container">
+        <div class="side-bar">
+            <!-- Profile header section -->
+            <div class="profile-header">
+                <div class="user-profile">
+                    <div class="user-profile-info">
+                        <div id="imge">{{ current_user.username[:2].upper() }}</div>
+                        <div class="same" id="name">{{ current_user.username }}</div>
+                        <div class="logout-button"><a href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a></div>
+                    </div>
+                </div>
+
+                <div class="csb-options">
+                    <a href="/chat"><i class="fa-regular fa-comments"></i></i></a>
+                    <a href="/friend_requests"><i class="fa-regular fa-bell"></i></a>
+                    <a href="/add_friend"><i class="fa-regular fa-user"></i></a>
+                </div>
+            </div>
+
+            <div class="profile-body">
+                <h3>Friends</h3>
+                <div id="friends-list">
+                    {% if friends %}
+                        {% for friend in friends %}
+                        <div class="other-users" onclick="window.location.href='/chat/{{ friend.id }}'">
+                            <div style="display: flex; align-items: center;">
+                                <div class="user-avatar" style="width: 20%;">{{ friend.username[:2].upper() }}</div>
+                                <div style="margin-left: 5px;">
+                                    <div style="font-weight: bold;">{{ friend.username }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="profile-body-msg" style="justify-content: center; text-align:center; margin-top: 50%; font-weight:100">No friends yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main chat body -->
+        <div class="main-body">
+            <div class="main-body-header">Add Friends</div>
+
+            <div class="search-section">
+                <div class="search-container">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search search-icon"></i>
+                        <input type="text" id="friendSearch" placeholder="Search for users by name, username, or email..." />
+                        <button type="button" class="clear-btn" id="clearSearch" style="display: none;">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-area" id="searchResults">
+                <div class="message-area">
+                    <i class="fa-solid fa-user-plus search-placeholder-icon"></i>
+                    <p>Search for users to add as friends</p>
+                    <p class="search-hint">Try searching by name, username, or email address</p>
+                </div>
+            </div>
+
+            <div class="search-results-list" id="searchResultsList">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+    </div>
+
+  <script>
+    let searchTimeout;
+    const searchInput = document.getElementById('friendSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const searchResults = document.getElementById('searchResults');
+    const searchResultsList = document.getElementById('searchResultsList');
+
+    searchInput.addEventListener('input', function() {
+      const query = this.value.trim();
+
+      if(query.length > 0){
+        clearBtn.style.display = 'block';
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          searchUsers(query);
+        }, 300);
+      } else {
+        clearBtn.style.display = 'none';
+        showDefaultState();
+      }
+    });
+
+    clearBtn.addEventListener('click', function(){
+      searchInput.value = '';
+      clearBtn.style.display = 'none';
+      showDefaultState();
+    });
+
+    function showDefaultState(){
+      searchResults.style.display = 'flex';
+      searchResultsList.style.display = 'none';
+      searchResultsList.innerHTML = '';
+    }
+
+    function searchUsers(query) {
+      searchResults.innerHTML = `
+        <div class="message-area">
+           <i class="fa-solid fa-spinner loading" style="font-size: 24px;"></i>
+            <p>Searching...</p>
+        </div>`;
+            
+        fetch(`/search_users?query=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(users => {
+          displaySearchResults(users);
+        })
+          .catch(error => {
+              console.error('Error:', error);
+              searchResults.innerHTML = `
+              <div class="message-area">
+                  <i class="fa-solid fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+                  <p>Error searching users</p>
+              </div>`; });
+      }
+
+      function displaySearchResults(users){
+        if(users.length == 0){
+          searchResults.style.display = 'flex';
+          searchResultsList.style.display = 'none';
+          searchResults.innerHTML = `
+                    <div class="message-area">
+                        <i class="fa-solid fa-user-slash" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                        <p>No users found</p>
+                        <p class="search-hint">Try a different search term</p>
+                    </div>
+                `;
+                 return;
+        }
+
+        searchResults.style.display = 'none';
+        searchResultsList.style.display = 'block';
+
+        searchResultsList.innerHTML = users.map(user => `
+                <div class="user-result" id="user-${user.id}">
+                    <div class="user-avatar">${user.initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-username">${user.email}</div>
+                    </div>
+                    ${getActionButton(user)}
+                </div>
+        `).join('');
+      }
+
+      function getActionButton(user){
+        switch(user.status){
+          case 'accepted': return '<button class="add-friend-btn" disabled><i class="fa-solid fa-check"></i> Friends</button>';
+          case 'pending' : return '<button class="add-friend-btn" disabled><i class="fa-solid fa-clock"></i> Pending</button>';
+          default: return `<button class="add-friend-btn" onclick="sendFriendRequest(${user.id})"><i class="fa-solid fa-user-plus"></i> Add Friend</button>`;
+        }
+      }
+
+      function sendFriendRequest(userId){
+        console.log('Sending friend request to user: ', userId)
+        const button = document.querySelector(`#user-${userId} .add-friend-btn`);
+
+        if(!button){
+          console.error('Button not found for user:', userId)
+        }
+
+        const originalContent = button.innerHTML;
+
+        button.innerHTML = '<i class="fa-solid fa-spinner loading"></i> Sending...';
+        button.disabled = true;
+
+        fetch(`/send_request/${userId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application/json',
+          }
+        })
+        .then(response => {
+          console.log('Response status: ', response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          return response.json();
+        })
+        .then(data => {
+          console.log('Response data: ', data);
+          if(data && data.success){
+            button.innerHTML = '<i class="fa-solid fa-clock"></i> Pending';
+            showNotification(data.message, 'success');
+          }
+          else{
+            button.innerHTML = originalContent;
+            button.disabled = false;
+            showNotification(data?.message || 'Request Failes', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Fetch error:', error);
+          button.innerHTML = originalContent;
+          button.disabled = false;
+          showNotification('An error occurred', 'error');
+        });
+      }
+
+      function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+  </script>
+</body>
+</html>

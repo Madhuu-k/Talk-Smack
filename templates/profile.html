@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Profile Page</title>
+</head>
+<body>
+    <div class="profile-header">
+        <h2 id="task">User Profile</h2>
+        <hr style="width: 100%;">
+    </div>
+    
+    <div class="profile-page">
+        <div class="user-profile">
+            <div class="profile-details">
+                <div class="profile-image"><img src="{{ url_for('static', filename='profile_pics/' ~ current_user.profile_pic) }}" class="profile-pic-large" alt="Profile Picture"></div>
+                <div class="profile-username"><p><b>Username:</b> {{ current_user.username }}</p></div>
+                <div class="nickname"><p><b>Nickname:</b> IDK</p></div>
+                <div class="profile-dob"><p><b>Date of Birth:</b> {{ current_user.dob }}</p></div>
+                <div class="profile-email"><p><b>Email:</b> {{ current_user.email }}</p></div>
+                <div class="red-chat"><button onclick="window.location.href='{{ url_for('chat') }}'">Back to Chat</button></div>  
+            </div>
+        </div>
+
+        <div class="user-profile-stats">
+        </div>
+        <div class="user-profile">
+            <div class="profile-details">
+                <div class="profile-image"><img src="{{ url_for('static', filename='profile_pics/' ~ current_user.profile_pic) }}" class="profile-pic-large" alt="Profile Picture"></div>
+                <div class="profile-username"><p><b>Username:</b> {{ current_user.username }}</p></div>
+                <div class="nickname"><p><b>Nickname:</b> IDK</p></div>
+                <div class="profile-dob"><p><b>Date of Birth:</b> {{ current_user.dob }}</p></div>
+                <div class="profile-email"><p><b>Email:</b> {{ current_user.email }}</p></div>
+                <div class="red-chat"><button onclick="window.location.href='{{ url_for('chat') }}'">Back to Chat</button></div>  
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

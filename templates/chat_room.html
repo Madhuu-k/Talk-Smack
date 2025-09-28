@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Talk Smack - Chat with {{ friend.username }}</title>
+    <script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    
+    <style>
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 70%;
+        }
+        
+        .outgoing-msg {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .incoming-msg {
+            align-self: flex-start;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .message-content {
+            background: #f3f4f6;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+        }
+        
+        .outgoing-msg .message-content {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .chat-input:focus {
+            border-color: #3b82f6;
+        }
+        
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover {
+            background: #2563eb;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            padding: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 50%;
+            color: #6b7280;
+            font-size: 18px;
+        }
+        
+        .back-btn:hover {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="messages-page" data-room-id="{{ room.id }}" data-current-user-id="{{ current_user.id }}" data-current-username="{{ current_user.username }}">
+    <div class="main-container">
+        <div class="side-bar">
+            <!-- Profile header section -->
+            <div class="profile-header">
+                <div class="user-profile">
+                    <div class="user-profile-info">
+                        <div id="imge">{{ current_user.username[:2].upper() }}</div>
+                        <div class="same" id="name">{{ current_user.username }}</div>
+                        <div class="logout-button"><a href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a></div>
+                    </div>
+                </div>
+                
+                <div class="csb-options">
+                    <a href="/chat"><i class="fa-regular fa-comments"></i></a>
+                    <a href="/friend_requests"><i class="fa-regular fa-bell"></i></a>
+                    <a href="/add_friend"><i class="fa-regular fa-user"></i></a>
+                </div>
+            </div>
+            
+            <!-- Sidebar body -->
+            <div class="profile-body">
+                <h3>Friends</h3>
+                <div id="friends-list">
+                    {% for f in friends %}
+                    <div class="other-users {% if f.id == friend.id %}active{% endif %}" onclick="window.location.href='/chat/{{ f.id }}'">
+                        <div style="display: flex; align-items: center;">
+                            <div class="user-avatar" style="width: 20%;">{{ f.username[:2].upper() }}</div>
+                            <div style="margin-left: 5px;">
+                                <div style="font-weight: bold;">{{ f.username }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main chat body -->
+        <div class="main-body">
+            <div class="chat-header">
+                <button class="back-btn" onclick="window.location.href='/chat'">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="user-avatar" style="width: 4%">{{ friend.username[:2].upper() }}</div>
+                <div>
+                    <div style="font-weight: bold; color: #111827;">{{ friend.username }}</div>
+                    <div style="font-size: 14px; color: #6b7280;">{{ friend.email }}</div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                {% for message in messages %}
+                <div class="message {% if message.sender_id == current_user.id %}outgoing-msg{% else %}incoming-msg{% endif %}">
+                    <div class="message-avatar">{{ message.sender.username[:2].upper() }}</div>
+                    <div>
+                        <div class="message-content">{{ message.content }}</div>
+                        <div class="message-time">{{ message.timestamp.strftime('%H:%M') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="messageInput" class="chat-input" placeholder="Type a message..." />
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Pass Flask variables to JavaScript safely
+        var socket = io();
+        var roomId = parseInt(document.body.getAttribute('data-room-id'));
+        var currentUserId = parseInt(document.body.getAttribute('data-current-user-id'));
+        var currentUsername = document.body.getAttribute('data-current-username');
+        
+        socket.emit('join', {room: roomId});
+        
+        socket.on('message', function(data) {
+            appendMessage(data);
+        });
+        
+        function appendMessage(data) {
+            var messagesContainer = document.getElementById('chat-messages');
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (data.sender_id === currentUserId ? 'outgoing-msg' : 'incoming-msg');
+            
+            messageDiv.innerHTML = 
+                '<div class="message-avatar">' + data.username.substring(0, 2).toUpperCase() + '</div>' +
+                '<div>' +
+                    '<div class="message-content">' + data.content + '</div>' +
+                    '<div class="message-time">' + data.timestamp + '</div>' +
+                '</div>';
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function sendMessage() {
+            var input = document.getElementById('messageInput');
+            var message = input.value.trim();
+            
+            if (message && roomId && !isNaN(roomId)) {
+                socket.emit('message', {
+                    room_id: roomId,
+                    message: message
+                });
+                input.value = '';
+            }
+        }
+        
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Auto scroll to bottom on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var messagesContainer = document.getElementById('chat-messages');
+            if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+    </script>
+</body>
+</html>

@@ -1,17 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head><title>Login</title>
-<link rel="stylesheet" href="/static/css/style.css"></head>
-<body>
-  <div class="user-space">
-    <h2 id="task">Login</h2>
-    <hr style="width: 100%;">
-    <form method="POST">
-      <input name="username" placeholder="Username">
-      <input type="password" name="password" placeholder="Password">
-      <button type="submit">Login</button>
-    </form>
-    <h3>Don't have an account? <a href="/register"> Register</a> it's free</h3>
-  </div>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body style=" height: 100vh; display: flex; justify-content: center; align-items: center;">
+  <div class="login-register-body">
+      <div class="user-space">
+        <i class="fa-regular fa-comment"></i>
+        <h2 style="margin-top: 15px;">Talk Smack</h2>
+        <p id="task" style="margin-bottom: 15px;">Sign in to your account</p>
+        <form method="POST">
+          <div class="take-input">
+            <p id="ip-placeholder">Username</p>
+            <input name="username" placeholder="Username" style="font-size:medium;">
+          </div>
+
+          <div class="take-input" style="margin-top: 5px;">
+            <p id="ip-placeholder">Password</p>
+            <input type="password" name="password" placeholder="Password" style="font-size:medium;">
+          </div>
+
+          <div class="take-input">
+            <button type="submit" style="margin-top: 8px;">Login</button>
+          </div>
+        </form>
+        <h3>Don't have an account? <a href="/register"> Register</a> it's free</h3>
+      </div>
+    </div>
 </body>
 </html>

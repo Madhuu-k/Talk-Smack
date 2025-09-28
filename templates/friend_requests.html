@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body class="notifications-page">
+  <div class="main-container">
+        <div class="side-bar">
+            <!-- Profile header section -->
+            <div class="profile-header">
+                <div class="user-profile">
+                    <div class="user-profile-info">
+                        <div id="imge">{{ current_user.username[:2].upper() }}</div>
+                        <div class="same" id="name">{{ current_user.username }}</div>
+                        <div class="logout-button"><a href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a></div>
+                    </div>
+                </div>
+
+                <div class="csb-options">
+                    <a href="/chat"><i class="fa-regular fa-comments"></i></a>
+                    <a href="/friend_requests"><i class="fa-regular fa-bell"></i></a>
+                    <a href="/add_friend"><i class="fa-regular fa-user"></i></a>
+                </div>
+            </div>
+
+            <div class="profile-body">
+                <h3>Friends</h3>
+                <div id="friends-list">
+                    {% if friends %}
+                        {% for friend in friends %}
+                        <div class="other-users" onclick="window.location.href='/chat/{{ friend.id }}'">
+                            <div style="display: flex; align-items: center;">
+                                <div class="user-avatar" style="width: 20%;">{{ friend.username[:2].upper() }}</div>
+                                <div style="margin-left: 5px;">
+                                    <div style="font-weight: bold;">{{ friend.username }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="profile-body-msg" style="justify-content: center; text-align:center; margin-top: 50%; font-weight:100">No friends yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main chat body -->
+        <div class="main-body">
+            <div class="main-body-header">Friend Requests</div>
+             <div class="chat-area" id="requestsArea">
+                {% if requests %}
+                    <div class="request-status">
+                        {% for req in requests %}
+                        <div class="req-user" id="request-{{ req.id }}">
+                            <div class="user-avatar" style="width: 20%; height: 80%;">{{ req.user.username[:2].upper() }}</div>
+                            <div class="user-info">
+                                <div class="username">{{ req.user.username }}</div>
+                                                <div style="color: #6b7280; font-size: 14px;">{{ req.user.email }}</div>
+                                <div class="actions" style="margin-top: 20px;">
+                                    <button class="req-button accept" onclick="respondToRequest('{{ req.id }}', 'accept')">Accept</button>
+                                    <button class="req-button reject" onclick="respondToRequest('{{ req.id }}', 'reject')">Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="message-area">
+                        <i class="fa-solid fa-user-plus" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                        <p>No pending friend requests</p>
+                    </div>
+                {% endif %}
+          </div>
+    </div>
+
+  <script>
+        function respondToRequest(requestId, action) {
+            fetch(`/respond_request/${requestId}/${action}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the request from the UI
+                    const requestElement = document.getElementById(`request-${requestId}`);
+                    requestElement.remove();
+                    
+                    // Check if no more requests
+                    const remainingRequests = document.querySelectorAll('.req-user');
+                    if (remainingRequests.length === 0) {
+                        document.getElementById('requestsArea').innerHTML = `
+                            <div class="message-area">
+                                <i class="fa-solid fa-user-plus" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                <p>No pending friend requests</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Show success message
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

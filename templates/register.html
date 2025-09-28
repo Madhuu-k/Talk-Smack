@@ -3,26 +3,47 @@
 <head>
   <title>Register</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://kit.fontawesome.com/68a5abc746.js" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
-<body>
-  <div class="user-space">
-    <h2 id="task">Register</h2><hr>
-    <form method="POST" enctype="multipart/form-data">
-      <input name="username" placeholder="Username">
+<body style=" height: 100vh; display: flex; justify-content: center; align-items: center;">
+  <div class="login-register-body">
+      <div class="user-space">
+        <i class="fa-regular fa-comment"></i>
+        <h2 style="margin-top: 15px;">Talk Smack</h2>
+        <p id="task" style="margin-bottom: 5px;">Create your account</p>
+        <form method="POST" enctype="multipart/form-data">
+          <div class="take-input">
+            <p id="ip-placeholder">Full Name</p>
+            <input name="full-name" placeholder="Enter your full name" style="font-size:medium;">
+          </div>
 
-      <input type="password" name="password" placeholder="Password">
+          <div class="take-input" style="margin-top: 5px;">
+            <p id="ip-placeholder">Username</p>
+            <input name="username" placeholder="Choose a username" style="font-size:medium;">
+          </div>
 
-      <input type="password" name="confirm_password" placeholder="Confirm Password">
+          <div class="take-input" style="margin-top: 5px;">
+            <p id="ip-placeholder">Password</p>
+            <input name="password" placeholder="Create a password" style="font-size:medium;">
+          </div>
 
-      <input type="email" name="email" placeholder="Email Address">
+          <div class="take-input" style="margin-top: 5px;">
+            <p id="ip-placeholder">Confirm password</p>
+            <input name="confirm_password" placeholder="Confirm your password" style="font-size:medium;">
+          </div>
 
-      <input type="date" name="dob" placeholder="Date of Birth">
+          <div class="take-input" style="margin-top: 5px;">
+            <p id="ip-placeholder">Email</p>
+            <input type="email" name="email" placeholder="Enter your email" style="font-size:medium;" required>
+          </div>
 
-      <input type="file" name="profile_pic">
-
-      <button type="submit">Register</button>
-    </form>
-    <h3>Have an account? <a href="/login"> Login</a></h3>
+          <div class="take-input">
+            <button type="submit">Register</button>
+            <h3 class="ask-login">Already have an account? <a href="/login"> Sign in</a></h3>
+          </div>
+        </form>
+      </div>
   </div>
 </body>
 </html>
