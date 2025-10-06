@@ -149,17 +149,17 @@ def register():
 
         # Username already exists
         if User.query.filter_by(username=username).first():
-            flash("⚠️ Username already exists!")
+            flash("Username already in use, please select another one")
             return redirect(url_for('register'))
 
         # Email already exists
         if User.query.filter_by(email=email).first():
-            flash("⚠️ Email already in use!")
+            flash("This email is already in use , please select a new one")
             return redirect(url_for('register'))
 
         # Passwords must match
         if password != confirm_password:
-            flash("⚠️ Passwords do not match!")
+            flash("Passwords don't match, reenter the password")
             return redirect(url_for('register'))
 
         # Save new user 
@@ -167,7 +167,7 @@ def register():
         new_user = User(username=username, password=hashed_pw, email=email)
         db.session.add(new_user)
         db.session.commit()
-        flash("✅ Registered successfully! Please log in.")
+        flash("Registered successfully! Please log in.")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -205,19 +205,6 @@ def friend_requests():
     requests = Friend.query.filter_by(friend_id=current_user.id, status="pending").all()
     friends = get_user_friends()
     return render_template('friend_requests.html', requests=requests, friends=friends)
-
-# @app.route('/add_friend', methods=['GET', 'POST'])
-# @login_required
-# def add_friend():
-#     if request.method == "POST":
-#         query = request.form.get("query")
-#         users = User.query.filter(
-#             (User.username.contains(query)) |
-#             (User.email.contains(query))
-#         ).all()
-#         return render_template('add_friend.html', results=users)
-    
-#     return render_template('add_friend.html', results=None)
 
 @app.route('/add_friend')
 @login_required
@@ -310,6 +297,10 @@ def respond_request(request_id, action):
 def chat():
     friends = get_user_friends()
     return render_template('chat.html', friends=friends)
+
+@app.route('/reset_password')
+def resetPassword():
+    return render_template('reset_password.html')
 
 
 @app.route('/chat/<int:friend_id>')
